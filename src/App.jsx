@@ -90,6 +90,40 @@ function App() {
     }
   }
 
+  const handleExportData = () => {
+    try {
+      dbService.initialize()
+      dbService.exportToFile()
+      alert('Data exported successfully!')
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      alert('Error exporting data. Please try again.')
+    }
+  }
+
+  const handleImportData = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        try {
+          await dbService.initialize()
+          await dbService.importFromFile(e.target.result)
+
+          // Reload records
+          const allRecords = await dbService.getAllDocuments()
+          setRecords(allRecords)
+
+          alert('Data imported successfully!')
+        } catch (error) {
+          console.error('Error importing data:', error)
+          alert('Error importing data. Please check the file format.')
+        }
+      }
+      reader.readAsText(file)
+    }
+  }
+
   // Initialize database on app start
   const initializeDatabase = async () => {
     try {
@@ -151,6 +185,22 @@ function App() {
               >
                 📋 Records
               </button>
+              <button
+                onClick={handleExportData}
+                className="px-4 py-2 rounded-md text-sm font-medium text-green-600 hover:text-green-700 hover:bg-green-50 transition-all duration-200 border border-green-200 hover:border-green-300"
+                title="Export data to file"
+              >
+                📤 Export
+              </button>
+              <label className="px-4 py-2 rounded-md text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-all duration-200 border border-blue-200 hover:border-blue-300 cursor-pointer">
+                📥 Import
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportData}
+                  className="hidden"
+                />
+              </label>
               <button
                 onClick={handleResetDatabase}
                 className="px-4 py-2 rounded-md text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-all duration-200 border border-orange-200 hover:border-orange-300"

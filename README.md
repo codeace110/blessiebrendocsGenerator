@@ -6,8 +6,9 @@ A simple document management system for computer and electronics repair services
 
 - **Three Document Types**: Quotation, Technical, and Billing forms
 - **Simple CRUD Operations**: Create, Read, Update, Delete documents
+- **File-Based Storage**: Data persists in browser's local storage
+- **Data Export/Import**: Backup and restore your data
 - **Clean Interface**: Easy-to-use forms and record management
-- **Local Storage**: Data persists in browser memory
 
 ## Database Schema (db.sql)
 
@@ -25,6 +26,14 @@ CREATE TABLE documents (
     -- Additional fields for different document types...
 );
 ```
+
+## Data Persistence
+
+- **File-Based Storage**: Data is saved to browser's localStorage
+- **Automatic Saving**: All changes are automatically saved
+- **Data Export**: Export your data as JSON file for backup
+- **Data Import**: Import previously exported data
+- **Reset Option**: Clear all data when needed
 
 ## Simple CRUD Operations
 
@@ -51,9 +60,17 @@ CREATE TABLE documents (
 4. **View Records**: Click "Records" to see all saved documents
 5. **Manage**: View, edit, or delete documents as needed
 
-## Reset Database
+## Data Management
 
-Click "Reset DB" to clear all data and start fresh.
+- **Export Data**: Click "📤 Export" to download your data as JSON file
+- **Import Data**: Click "📥 Import" to restore from a backup file
+- **Reset Database**: Click "🔄 Reset DB" to clear all data and start fresh
+
+## Data Persistence
+
+- Data is automatically saved to your browser's storage
+- Your documents will persist between browser sessions
+- Use Export/Import for backup and data transfer
 
 ## Technology Stack
 

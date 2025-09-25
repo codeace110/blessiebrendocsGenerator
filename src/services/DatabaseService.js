@@ -5,6 +5,7 @@ class DatabaseService {
     }
 
     this.db = null
+    this.dbFileName = 'documents_db.json'
     DatabaseService.instance = this
   }
 
@@ -12,20 +13,45 @@ class DatabaseService {
     if (this.db) return // Already initialized
 
     try {
-      // Simple in-memory storage for now
-      // In a real application, this would connect to the db.sql file
+      // Load data from file (localStorage for now)
+      const savedData = this.loadFromFile()
+
       this.db = {
-        documents: [],
-        nextId: 1
+        documents: savedData.documents || [],
+        nextId: savedData.nextId || 1
       }
 
-      // Seed database with sample data
-      await this.seedDatabase()
+      // Seed database with sample data if empty
+      if (this.db.documents.length === 0) {
+        await this.seedDatabase()
+      }
 
       console.log('Database initialized successfully')
     } catch (error) {
       console.error('Error initializing database:', error)
       throw error
+    }
+  }
+
+  // File operations
+  loadFromFile() {
+    try {
+      const saved = localStorage.getItem(this.dbFileName)
+      return saved ? JSON.parse(saved) : { documents: [], nextId: 1 }
+    } catch (error) {
+      console.warn('Error loading from file:', error)
+      return { documents: [], nextId: 1 }
+    }
+  }
+
+  saveToFile() {
+    try {
+      localStorage.setItem(this.dbFileName, JSON.stringify({
+        documents: this.db.documents,
+        nextId: this.db.nextId
+      }))
+    } catch (error) {
+      console.error('Error saving to file:', error)
     }
   }
 
@@ -198,6 +224,7 @@ class DatabaseService {
       }
 
       this.db.documents.push(newDocument)
+      this.saveToFile() // Save to file
       return newDocument
     } catch (error) {
       console.error('Error saving document:', error)
@@ -254,6 +281,7 @@ class DatabaseService {
         id: parseInt(id) // Ensure ID remains the same
       }
 
+      this.saveToFile() // Save to file
       return this.db.documents[index]
     } catch (error) {
       console.error('Error updating document:', error)
@@ -274,6 +302,7 @@ class DatabaseService {
       }
 
       this.db.documents.splice(index, 1)
+      this.saveToFile() // Save to file
       return true
     } catch (error) {
       console.error('Error deleting document:', error)
@@ -290,9 +319,57 @@ class DatabaseService {
     try {
       this.db.documents = []
       this.db.nextId = 1
+      this.saveToFile() // Save to file
       return true
     } catch (error) {
       console.error('Error clearing documents:', error)
+      throw error
+    }
+  }
+
+  // Export data to file
+  exportToFile() {
+    try {
+      const dataStr = JSON.stringify({
+        documents: this.db.documents,
+        nextId: this.db.nextId,
+        exported_at: new Date().toISOString()
+      }, null, 2)
+
+      const dataBlob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(dataBlob)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `documents_backup_${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      URL.revokeObjectURL(url)
+      console.log('Data exported successfully')
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      throw error
+    }
+  }
+
+  // Import data from file
+  async importFromFile(fileContent) {
+    try {
+      const importedData = JSON.parse(fileContent)
+
+      if (importedData.documents && Array.isArray(importedData.documents)) {
+        this.db.documents = importedData.documents
+        this.db.nextId = importedData.nextId || Math.max(...this.db.documents.map(doc => doc.id)) + 1
+        this.saveToFile()
+        console.log(`Imported ${this.db.documents.length} documents`)
+        return true
+      } else {
+        throw new Error('Invalid file format')
+      }
+    } catch (error) {
+      console.error('Error importing data:', error)
       throw error
     }
   }
