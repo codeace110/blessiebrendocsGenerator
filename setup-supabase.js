@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { readFileSync } from 'fs'
 
-// Read environment variables
-const supabaseUrl = 'https://ftzeunlsbfnlmovuhnps.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0emV1bmxzYmZubG1vdnVobnBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MTMxNjIsImV4cCI6MjA3NDM4OTE2Mn0.2H-MLxBvu_XyFQCh4BgEMvBBgI7Mhy9qgz8f9W2OMhc'
+const envContent = readFileSync('.env.local', 'utf8')
+const supabaseUrl = envContent.match(/VITE_SUPABASE_URL=(.+)/)?.[1]
+const supabaseKey = envContent.match(/VITE_SUPABASE_ANON_KEY=(.+)/)?.[1]
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
