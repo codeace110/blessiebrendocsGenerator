@@ -12,14 +12,14 @@ CREATE TABLE IF NOT EXISTS documents (
     customer_address_line2 TEXT,
     customer_phone TEXT,
     description TEXT,
-    amount DECIMAL(10,2),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    amount DECIMAL(10,2) NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
 
     -- Quotation specific fields
     item_name TEXT,
     item_description TEXT,
-    quantity INTEGER,
-    unit_price DECIMAL(10,2),
+    quantity INTEGER NULL,
+    unit_price DECIMAL(10,2) NULL,
     remarks TEXT,
     quotation_items JSONB,
     quotation_type TEXT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS documents (
 
     -- Billing form specific fields
     invoice_number TEXT,
-    due_date DATE,
+    due_date DATE NULL,
     billing_items JSONB,
 
     -- Company information fields

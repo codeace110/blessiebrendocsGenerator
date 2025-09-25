@@ -170,12 +170,7 @@ class DatabaseService {
     await this.initialize()
 
     try {
-      const newDocument = {
-        ...documentData,
-        created_at: new Date().toISOString()
-      }
-
-      return await this.saveDocumentToSupabase(newDocument)
+      return await this.saveDocumentToSupabase(documentData)
     } catch (error) {
       throw new Error(`Failed to save document: ${error.message}`)
     }

@@ -199,10 +199,31 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
       }
     }
 
-    // Convert amount to number if provided
+    // Get current date and calculate due date (30 days from now)
+    const currentDate = new Date()
+    const dueDate = new Date(currentDate)
+    dueDate.setDate(currentDate.getDate() + 30)
+
+    // Convert and validate all numeric fields
     const submitData = {
       ...formData,
-      amount: formData.amount ? parseFloat(formData.amount) : null
+      // Main amount field
+      amount: formData.amount ? parseFloat(formData.amount) : null,
+      // Quotation items - ensure all numeric fields are properly converted
+      quotation_items: formData.quotation_items.map(item => ({
+        ...item,
+        quantity: item.quantity ? parseInt(item.quantity) : 1,
+        unit_price: item.unit_price ? parseFloat(item.unit_price) : 0
+      })),
+      // Billing items - ensure all numeric fields are properly converted
+      billing_items: formData.billing_items.map(item => ({
+        ...item,
+        quantity: item.quantity ? parseInt(item.quantity) : 1,
+        amount: item.amount ? parseFloat(item.amount) : 0
+      })),
+      // Date fields
+      due_date: formData.due_date || dueDate.toISOString().split('T')[0],
+      created_at: currentDate.toISOString()
     }
     console.log('Submitting data:', submitData)
 
