@@ -204,25 +204,25 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
     const dueDate = new Date(currentDate)
     dueDate.setDate(currentDate.getDate() + 30)
 
-    // Convert and validate all numeric fields
+    // Convert and validate all numeric fields - ensure no empty strings
     const submitData = {
       ...formData,
-      // Main amount field
-      amount: formData.amount ? parseFloat(formData.amount) : null,
+      // Main amount field - ensure it's a valid number or null
+      amount: formData.amount && formData.amount.trim() !== '' ? parseFloat(formData.amount) : null,
       // Quotation items - ensure all numeric fields are properly converted
       quotation_items: formData.quotation_items.map(item => ({
         ...item,
-        quantity: item.quantity ? parseInt(item.quantity) : 1,
-        unit_price: item.unit_price ? parseFloat(item.unit_price) : 0
+        quantity: item.quantity && item.quantity.trim() !== '' ? parseInt(item.quantity) : 1,
+        unit_price: item.unit_price && item.unit_price.trim() !== '' ? parseFloat(item.unit_price) : 0
       })),
       // Billing items - ensure all numeric fields are properly converted
       billing_items: formData.billing_items.map(item => ({
         ...item,
-        quantity: item.quantity ? parseInt(item.quantity) : 1,
-        amount: item.amount ? parseFloat(item.amount) : 0
+        quantity: item.quantity && item.quantity.trim() !== '' ? parseInt(item.quantity) : 1,
+        amount: item.amount && item.amount.trim() !== '' ? parseFloat(item.amount) : 0
       })),
       // Date fields
-      due_date: formData.due_date || dueDate.toISOString().split('T')[0],
+      due_date: formData.due_date && formData.due_date.trim() !== '' ? formData.due_date : dueDate.toISOString().split('T')[0],
       created_at: currentDate.toISOString()
     }
     console.log('Submitting data:', submitData)

@@ -12,7 +12,13 @@ class DatabaseService {
     // Initialize Supabase client
     this.supabase = createClient(
       import.meta.env.VITE_SUPABASE_URL,
-      import.meta.env.VITE_SUPABASE_ANON_KEY
+      import.meta.env.VITE_SUPABASE_ANON_KEY,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
     this.initialized = false
@@ -60,14 +66,17 @@ class DatabaseService {
 
     try {
       // Test connection by attempting a simple query
-      const { error } = await this.supabase.from('documents').select('count').limit(1)
+      const { data, error } = await this.supabase.from('documents').select('count').limit(1)
 
       if (error && error.code !== 'PGRST116') { // PGRST116 = table doesn't exist
+        console.error('Database initialization error:', error)
         throw new Error(`Database connection failed: ${error.message}`)
       }
 
       this.initialized = true
+      console.log('Database initialized successfully')
     } catch (error) {
+      console.error('Database initialization failed:', error)
       throw new Error(`Failed to initialize database: ${error.message}`)
     }
   }
