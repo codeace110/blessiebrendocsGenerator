@@ -46,7 +46,9 @@ CREATE TABLE documents (
 - Click "View" on any record to see details
 
 ### Update
-- Click "Edit" on any record (placeholder for future implementation)
+- Click "Edit" on any record to modify it
+- Form will be pre-populated with existing data
+- Click "Update Document" to save changes
 
 ### Delete
 - Click "Delete" on any record to remove it

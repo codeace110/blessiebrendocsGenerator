@@ -340,11 +340,15 @@ const DocumentReview = ({ record, onBack }) => {
           <div className="flex justify-between items-start px-6 pt-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 shadow-sm rounded overflow-hidden">
+                <div className="w-12 h-12 shadow-sm rounded overflow-hidden bg-gray-100 flex items-center justify-center">
                   <img
                     src="/logo.png"
                     alt="Company Logo"
                     className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">LOGO</div>';
+                    }}
                   />
                 </div>
                 <div>

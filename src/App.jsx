@@ -9,17 +9,36 @@ function App() {
   const [selectedFormType, setSelectedFormType] = useState('quotation')
   const [selectedRecord, setSelectedRecord] = useState(null)
   const [records, setRecords] = useState([])
+  const [editingRecord, setEditingRecord] = useState(null)
   const [dbService] = useState(() => new DatabaseService())
 
   const handleFormSubmit = async (formData) => {
     try {
       await dbService.initialize()
-      const newRecord = await dbService.saveDocument({
-        ...formData,
-        form_type: selectedFormType
-      })
-      setRecords([...records, newRecord])
-      alert('Document saved successfully!')
+
+      if (editingRecord) {
+        // Update existing document
+        const updatedRecord = await dbService.updateDocument(editingRecord.id, {
+          ...formData,
+          form_type: selectedFormType
+        })
+
+        // Update in local state
+        setRecords(records.map(record =>
+          record.id === editingRecord.id ? updatedRecord : record
+        ))
+
+        alert('Document updated successfully!')
+        setEditingRecord(null)
+      } else {
+        // Create new document
+        const newRecord = await dbService.saveDocument({
+          ...formData,
+          form_type: selectedFormType
+        })
+        setRecords([...records, newRecord])
+        alert('Document saved successfully!')
+      }
     } catch (error) {
       console.error('Error saving document:', error)
       alert('Error saving document. Please try again.')
@@ -46,6 +65,7 @@ function App() {
   const handleBackToForm = () => {
     setCurrentView('form')
     setSelectedRecord(null)
+    setEditingRecord(null)
   }
 
   const handleBackToRecords = () => {
@@ -54,8 +74,10 @@ function App() {
   }
 
   const handleEditRecord = (record) => {
-    // For now, just show an alert - in a real app you might navigate to edit mode
-    alert(`Edit functionality for "${record.title}" will be implemented.`)
+    // Set up edit mode
+    setEditingRecord(record)
+    setSelectedFormType(record.form_type)
+    setCurrentView('form')
   }
 
   const handleDeleteRecord = async (recordId) => {
@@ -155,6 +177,10 @@ function App() {
                   src="/logo.png"
                   alt="Company Logo"
                   className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">LOGO</div>';
+                  }}
                 />
               </div>
               <div>
@@ -220,33 +246,49 @@ function App() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
                   <span className="w-1 h-6 bg-blue-600 rounded mr-3"></span>
-                  Select Document Type
+                  {editingRecord ? 'Edit Document' : 'Select Document Type'}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {['quotation', 'technical', 'billing'].map((type) => (
+                {!editingRecord && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {['quotation', 'technical', 'billing'].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedFormType(type)}
+                        className={`p-4 rounded-lg text-sm font-semibold capitalize transition-all duration-200 border-2 ${
+                          selectedFormType === type
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-lg'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <span className="text-lg">
+                            {type === 'quotation' ? '💰' : type === 'technical' ? '🔧' : '🧾'}
+                          </span>
+                          <span>{type} Form</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {editingRecord && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Editing:</strong> {editingRecord.title} (ID: {editingRecord.id})
+                    </p>
                     <button
-                      key={type}
-                      onClick={() => setSelectedFormType(type)}
-                      className={`p-4 rounded-lg text-sm font-semibold capitalize transition-all duration-200 border-2 ${
-                        selectedFormType === type
-                          ? 'bg-blue-600 text-white border-blue-600 shadow-lg'
-                          : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:shadow-md'
-                      }`}
+                      onClick={() => setEditingRecord(null)}
+                      className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
                     >
-                      <div className="flex items-center space-x-2">
-                        <span className="text-lg">
-                          {type === 'quotation' ? '💰' : type === 'technical' ? '🔧' : '🧾'}
-                        </span>
-                        <span>{type} Form</span>
-                      </div>
+                      Cancel Edit
                     </button>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
             <DocumentForm
               formType={selectedFormType}
               onSubmit={handleFormSubmit}
+              editingRecord={editingRecord}
             />
           </div>
         )}

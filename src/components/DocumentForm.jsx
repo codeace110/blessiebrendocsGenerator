@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const DocumentForm = ({ formType, onSubmit }) => {
+const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
   const [formData, setFormData] = useState({
     title: '',
     customer_name: '',
@@ -34,6 +34,80 @@ const DocumentForm = ({ formType, onSubmit }) => {
     company_address_line2: 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines',
     company_phone: '(083) 553 1734'
   })
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingRecord) {
+      setFormData({
+        title: editingRecord.title || '',
+        customer_name: editingRecord.customer_name || '',
+        customer_company: editingRecord.customer_company || '',
+        customer_address_line1: editingRecord.customer_address_line1 || '',
+        customer_address_line2: editingRecord.customer_address_line2 || '',
+        customer_phone: editingRecord.customer_phone || '',
+        description: editingRecord.description || '',
+        amount: editingRecord.amount || '',
+        // Quotation specific fields
+        item_name: editingRecord.item_name || '',
+        item_description: editingRecord.item_description || '',
+        quantity: editingRecord.quantity || '1',
+        unit_price: editingRecord.unit_price || '',
+        remarks: editingRecord.remarks || '',
+        quotation_items: editingRecord.quotation_items || [{ item_name: '', item_description: '', quantity: '1', unit_price: '' }],
+        quotation_type: editingRecord.quotation_type || 'repair',
+        // Technical form specific fields
+        specifications: editingRecord.specifications || '',
+        requirements: editingRecord.requirements || '',
+        technical_details: editingRecord.technical_details || '',
+        reference_number: editingRecord.reference_number || '',
+        // Billing form specific fields
+        invoice_number: editingRecord.invoice_number || '',
+        due_date: editingRecord.due_date || '',
+        billing_items: editingRecord.billing_items || [{ description: '', amount: '', quantity: '1' }],
+        // Company information fields
+        company_name: editingRecord.company_name || 'BLESSIE.BRENT',
+        company_tin: editingRecord.company_tin || '',
+        company_address_line1: editingRecord.company_address_line1 || 'QUIRINO AVENUE, CORNER Camia St',
+        company_address_line2: editingRecord.company_address_line2 || 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines',
+        company_phone: editingRecord.company_phone || '(083) 553 1734'
+      })
+    } else {
+      // Reset form for new document
+      setFormData({
+        title: '',
+        customer_name: '',
+        customer_company: '',
+        customer_address_line1: '',
+        customer_address_line2: '',
+        customer_phone: '',
+        description: '',
+        amount: '',
+        // Quotation specific fields
+        item_name: '',
+        item_description: '',
+        quantity: '1',
+        unit_price: '',
+        remarks: '',
+        quotation_items: [{ item_name: '', item_description: '', quantity: '1', unit_price: '' }],
+        quotation_type: 'repair',
+        // Technical form specific fields
+        specifications: '',
+        requirements: '',
+        technical_details: '',
+        reference_number: '',
+        // Billing form specific fields
+        invoice_number: '',
+        due_date: '',
+        billing_items: [{ description: '', amount: '', quantity: '1' }],
+        // Company information fields
+        company_name: 'BLESSIE.BRENT',
+        company_tin: '',
+        company_address_line1: 'QUIRINO AVENUE, CORNER Camia St',
+        company_address_line2: 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines',
+        company_phone: '(083) 553 1734'
+      })
+    }
+  }, [editingRecord])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -838,10 +912,14 @@ const DocumentForm = ({ formType, onSubmit }) => {
               src="/logo.png"
               alt="Company Logo"
               className="w-full h-full object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">LOGO</div>';
+              }}
             />
           </div>
           <h3 className="text-lg font-medium text-gray-900 capitalize">
-            {formType} Form
+            {editingRecord ? `Edit ${formType} Document` : `${formType} Form`}
           </h3>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -851,7 +929,7 @@ const DocumentForm = ({ formType, onSubmit }) => {
               type="submit"
               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Save Document
+              {editingRecord ? 'Update Document' : 'Save Document'}
             </button>
           </div>
         </form>

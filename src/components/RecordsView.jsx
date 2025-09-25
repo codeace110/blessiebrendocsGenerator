@@ -91,6 +91,10 @@ const RecordsView = ({ records, onSelectRecord, onEditRecord, onDeleteRecord, on
               src="/logo.png"
               alt="Company Logo"
               className="w-full h-full object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">LOGO</div>';
+              }}
             />
           </div>
           <h2 className="text-lg font-medium text-gray-900">Saved Documents</h2>
