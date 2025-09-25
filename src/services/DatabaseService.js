@@ -235,9 +235,7 @@ class DatabaseService {
 
   // Clear all documents
   async clearAllDocuments() {
-    if (!this.initialized) {
-      await this.initialize()
-    }
+    await this.initialize()
 
     try {
       const { error } = await this.supabase
@@ -272,13 +270,17 @@ class DatabaseService {
       document.body.removeChild(link)
 
       URL.revokeObjectURL(url)
+      console.log('✅ Data exported successfully')
     } catch (error) {
+      console.error('❌ Error exporting data:', error)
       throw new Error(`Failed to export data: ${error.message}`)
     }
   }
 
   // Import data from file
   async importFromFile(fileContent) {
+    await this.initialize()
+
     try {
       const importedData = JSON.parse(fileContent)
 
@@ -289,11 +291,13 @@ class DatabaseService {
           .select()
 
         if (error) throw error
+        console.log(`✅ Imported ${data.length} documents successfully`)
         return true
       } else {
         throw new Error('Invalid file format')
       }
     } catch (error) {
+      console.error('❌ Error importing data:', error)
       throw new Error(`Failed to import data: ${error.message}`)
     }
   }

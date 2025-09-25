@@ -61,7 +61,7 @@ function App() {
       await dbService.initialize()
       const allRecords = await dbService.getAllDocuments()
       setRecords(allRecords)
-      setCurrentView('records')
+      setCurrentView(VIEWS.RECORDS)
     } catch (error) {
       console.error('Error loading records:', error)
       alert(`❌ Error loading records: ${error.message}`)
@@ -128,14 +128,14 @@ function App() {
     alert(`Database Status: ${state.isInitialized ? 'Connected' : 'Disconnected'}`)
   }
 
-  const handleExportData = () => {
+  const handleExportData = async () => {
     try {
-      dbService.initialize()
-      dbService.exportToFile()
-      alert('Data exported successfully!')
+      await dbService.initialize()
+      await dbService.exportToFile()
+      alert('✅ Data exported successfully!')
     } catch (error) {
       console.error('Error exporting data:', error)
-      alert('Error exporting data. Please try again.')
+      alert(`❌ Error exporting data: ${error.message}`)
     }
   }
 
@@ -152,10 +152,10 @@ function App() {
           const allRecords = await dbService.getAllDocuments()
           setRecords(allRecords)
 
-          alert('Data imported successfully!')
+          alert('✅ Data imported successfully!')
         } catch (error) {
           console.error('Error importing data:', error)
-          alert('Error importing data. Please check the file format.')
+          alert(`❌ Error importing data: ${error.message}`)
         }
       }
       reader.readAsText(file)
@@ -171,9 +171,10 @@ function App() {
       const allRecords = await dbService.getAllDocuments()
       setRecords(allRecords)
 
-      console.log('Database initialized successfully')
+      console.log('✅ Database initialized successfully')
     } catch (error) {
-      console.error('Error initializing database:', error)
+      console.error('❌ Error initializing database:', error)
+      alert(`Database initialization failed: ${error.message}`)
     }
   }
 
