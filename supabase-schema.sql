@@ -48,16 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_form_type ON documents(form_type);
 CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_documents_customer_name ON documents(customer_name);
 
--- Enable Row Level Security (RLS)
-ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
-
--- Create policy to allow all operations for authenticated users
--- Note: In production, you might want to restrict this based on user roles
-CREATE POLICY "Allow all operations for authenticated users" ON documents
-    FOR ALL USING (auth.role() = 'authenticated');
-
--- Allow anonymous read access (for public viewing)
-CREATE POLICY "Allow anonymous read access" ON documents
-    FOR SELECT USING (true);
+-- Disable Row Level Security (RLS) for unrestricted access
+ALTER TABLE documents DISABLE ROW LEVEL SECURITY;
 
 -- Sample data insertion removed - start with clean database
