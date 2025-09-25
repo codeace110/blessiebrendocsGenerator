@@ -4,13 +4,24 @@ import RecordsView from './components/RecordsView'
 import DocumentReview from './components/DocumentReview'
 import DatabaseService from './services/DatabaseService'
 
+// Constants
+const DOCUMENT_TYPES = ['quotation', 'technical', 'billing']
+const VIEWS = {
+  FORM: 'form',
+  RECORDS: 'records',
+  REVIEW: 'review'
+}
+
 function App() {
-  const [currentView, setCurrentView] = useState('form')
-  const [selectedFormType, setSelectedFormType] = useState('quotation')
+  // State management
+  const [currentView, setCurrentView] = useState(VIEWS.FORM)
+  const [selectedFormType, setSelectedFormType] = useState(DOCUMENT_TYPES[0])
   const [selectedRecord, setSelectedRecord] = useState(null)
   const [records, setRecords] = useState([])
   const [editingRecord, setEditingRecord] = useState(null)
-  const [dbService] = useState(() => new DatabaseService())
+
+  // Database service instance
+  const [dbService] = useState(() => DatabaseService.getInstance())
 
   const handleFormSubmit = async (formData) => {
     try {
@@ -28,7 +39,7 @@ function App() {
           record.id === editingRecord.id ? updatedRecord : record
         ))
 
-        alert('Document updated successfully!')
+        alert('✅ Document updated successfully!')
         setEditingRecord(null)
       } else {
         // Create new document
@@ -37,11 +48,11 @@ function App() {
           form_type: selectedFormType
         })
         setRecords([...records, newRecord])
-        alert('Document saved successfully!')
+        alert('✅ Document saved successfully!')
       }
     } catch (error) {
       console.error('Error saving document:', error)
-      alert('Error saving document. Please try again.')
+      alert(`❌ Error: ${error.message}`)
     }
   }
 
@@ -53,7 +64,7 @@ function App() {
       setCurrentView('records')
     } catch (error) {
       console.error('Error loading records:', error)
-      alert('Error loading records. Please try again.')
+      alert(`❌ Error loading records: ${error.message}`)
     }
   }
 
@@ -87,15 +98,15 @@ function App() {
 
       // Remove from local state
       setRecords(records.filter(record => record.id !== recordId))
-      alert('Document deleted successfully!')
+      alert('✅ Document deleted successfully!')
     } catch (error) {
       console.error('Error deleting document:', error)
-      throw error
+      alert(`❌ Error deleting document: ${error.message}`)
     }
   }
 
   const handleResetDatabase = async () => {
-    if (window.confirm('This will clear all existing data. Continue?')) {
+    if (window.confirm('⚠️ This will permanently delete ALL documents. Continue?')) {
       try {
         await dbService.initialize()
         await dbService.clearAllDocuments()
@@ -104,12 +115,17 @@ function App() {
         const allRecords = await dbService.getAllDocuments()
         setRecords(allRecords)
 
-        alert('Database reset successfully! All data has been cleared.')
+        alert('✅ Database reset successfully! All data has been cleared.')
       } catch (error) {
         console.error('Error resetting database:', error)
-        alert('Error resetting database. Please try again.')
+        alert(`❌ Error resetting database: ${error.message}`)
       }
     }
+  }
+
+  const handleDebugDatabase = () => {
+    const state = DatabaseService.getCurrentState()
+    alert(`Database Status: ${state.isInitialized ? 'Connected' : 'Disconnected'}`)
   }
 
   const handleExportData = () => {
@@ -192,9 +208,9 @@ function App() {
             </div>
             <nav className="flex space-x-3">
               <button
-                onClick={() => setCurrentView('form')}
+                onClick={() => setCurrentView(VIEWS.FORM)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  currentView === 'form'
+                  currentView === VIEWS.FORM
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
@@ -204,7 +220,7 @@ function App() {
               <button
                 onClick={handleViewRecords}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  currentView === 'records'
+                  currentView === VIEWS.RECORDS
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
@@ -240,7 +256,7 @@ function App() {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {currentView === 'form' && (
+        {currentView === VIEWS.FORM && (
           <div className="px-4 py-6 sm:px-0">
             <div className="mb-8">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -250,7 +266,7 @@ function App() {
                 </h2>
                 {!editingRecord && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {['quotation', 'technical', 'billing'].map((type) => (
+                    {DOCUMENT_TYPES.map((type) => (
                       <button
                         key={type}
                         onClick={() => setSelectedFormType(type)}
@@ -293,7 +309,7 @@ function App() {
           </div>
         )}
 
-        {currentView === 'records' && (
+        {currentView === VIEWS.RECORDS && (
           <RecordsView
             records={records}
             onSelectRecord={handleSelectRecord}
@@ -303,7 +319,7 @@ function App() {
           />
         )}
 
-        {currentView === 'review' && selectedRecord && (
+        {currentView === VIEWS.REVIEW && selectedRecord && (
           <DocumentReview
             record={selectedRecord}
             onBack={handleBackToRecords}

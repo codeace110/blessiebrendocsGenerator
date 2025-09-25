@@ -397,31 +397,61 @@ const DocumentReview = ({ record, onBack }) => {
         </div>
 
         {/* Company & Customer Information - Compact Layout */}
-        <div className="px-6 mt-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="px-4 mt-2">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <h3 className="bg-gray-800 text-white px-3 py-1 font-bold text-xs mb-2">FROM</h3>
-              <div className="p-3 border border-gray-300 bg-white text-sm">
+              <h3 className="bg-gray-800 text-white px-2 py-1 font-bold text-xs mb-1">
+                {record.form_type === 'billing' ? 'BILL FROM' : 'FROM'}
+              </h3>
+              <div className="p-2 border border-gray-300 bg-white text-sm">
                 <div className="text-gray-700 space-y-1">
-                  <p className="font-semibold text-base">{record.company_name || 'BLESSIE.BRENT'}</p>
-                  <p className="text-xs">{record.company_address_line1 || 'QUIRINO AVENUE, CORNER Camia St'}</p>
-                  <p className="text-xs">{record.company_address_line2 || 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines'}</p>
-                  <p className="text-xs">Phone: {record.company_phone || '(083) 553 1734'}</p>
-                  {record.company_tin && <p className="text-xs">TIN: {record.company_tin}</p>}
+                  {record.form_type === 'billing' ? (
+                    // For billing forms, show customer info in FROM section
+                    <>
+                      <p className="font-semibold text-sm">{record.customer_name}</p>
+                      {record.customer_company && <p className="text-xs">{record.customer_company}</p>}
+                      {record.customer_address_line1 && <p className="text-xs">{record.customer_address_line1}</p>}
+                      {record.customer_address_line2 && <p className="text-xs">{record.customer_address_line2}</p>}
+                      {record.customer_phone && <p className="text-xs">Phone: {record.customer_phone}</p>}
+                    </>
+                  ) : (
+                    // For other forms, show company info in FROM section
+                    <>
+                      <p className="font-semibold text-sm">{record.company_name || 'BLESSIE.BRENT'}</p>
+                      <p className="text-xs">{record.company_address_line1 || 'QUIRINO AVENUE, CORNER Camia St'}</p>
+                      <p className="text-xs">{record.company_address_line2 || 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines'}</p>
+                      <p className="text-xs">Phone: {record.company_phone || '(083) 553 1734'}</p>
+                      {record.company_tin && <p className="text-xs">TIN: {record.company_tin}</p>}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
             <div>
-              <h3 className="bg-gray-800 text-white px-3 py-1 font-bold text-xs mb-2">
-                {record.form_type === 'quotation' ? 'QUOTE FOR' : 'BILL TO'}
+              <h3 className="bg-gray-800 text-white px-2 py-1 font-bold text-xs mb-1">
+                {record.form_type === 'quotation' ? 'QUOTE FOR' : record.form_type === 'billing' ? 'BILL TO' : 'BILL TO'}
               </h3>
-              <div className="p-3 border border-gray-300 bg-white text-sm">
+              <div className="p-2 border border-gray-300 bg-white text-sm">
                 <div className="text-gray-700 space-y-1">
-                  <p className="font-semibold text-base">{record.customer_name}</p>
-                  {record.customer_company && <p className="text-xs">{record.customer_company}</p>}
-                  {record.customer_address_line1 && <p className="text-xs">{record.customer_address_line1}</p>}
-                  {record.customer_address_line2 && <p className="text-xs">{record.customer_address_line2}</p>}
-                  {record.customer_phone && <p className="text-xs">Phone: {record.customer_phone}</p>}
+                  {record.form_type === 'billing' ? (
+                    // For billing forms, show company info in BILL TO section
+                    <>
+                      <p className="font-semibold text-sm">{record.company_name || 'BLESSIE.BRENT'}</p>
+                      <p className="text-xs">{record.company_address_line1 || 'QUIRINO AVENUE, CORNER Camia St'}</p>
+                      <p className="text-xs">{record.company_address_line2 || 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines'}</p>
+                      <p className="text-xs">Phone: {record.company_phone || '(083) 553 1734'}</p>
+                      {record.company_tin && <p className="text-xs">TIN: {record.company_tin}</p>}
+                    </>
+                  ) : (
+                    // For other forms, show customer info in BILL TO section
+                    <>
+                      <p className="font-semibold text-sm">{record.customer_name}</p>
+                      {record.customer_company && <p className="text-xs">{record.customer_company}</p>}
+                      {record.customer_address_line1 && <p className="text-xs">{record.customer_address_line1}</p>}
+                      {record.customer_address_line2 && <p className="text-xs">{record.customer_address_line2}</p>}
+                      {record.customer_phone && <p className="text-xs">Phone: {record.customer_phone}</p>}
+                    </>
+                  )}
                 </div>
               </div>
             </div>

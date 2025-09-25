@@ -165,9 +165,12 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    console.log('Form submission started with formType:', formType)
+    console.log('Form data:', formData)
 
     // Validate required fields
     if (!formData.title || !formData.customer_name) {
+      console.log('Validation failed: missing required fields')
       alert('Please fill in all required fields')
       return
     }
@@ -177,6 +180,7 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
       const validItems = formData.quotation_items.filter(item =>
         item.item_name && item.item_name.trim() !== ''
       )
+      console.log('Quotation validation - valid items:', validItems.length, 'total items:', formData.quotation_items.length)
       if (validItems.length === 0) {
         alert('Please add at least one repair service')
         return
@@ -188,6 +192,7 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
       const validItems = formData.billing_items.filter(item =>
         item.description && item.description.trim() !== ''
       )
+      console.log('Billing validation - valid items:', validItems.length, 'total items:', formData.billing_items.length)
       if (validItems.length === 0) {
         alert('Please add at least one billing item')
         return
@@ -199,9 +204,15 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
       ...formData,
       amount: formData.amount ? parseFloat(formData.amount) : null
     }
+    console.log('Submitting data:', submitData)
 
     try {
+      console.log('Calling onSubmit...')
       await onSubmit(submitData)
+      console.log('onSubmit completed successfully')
+
+      // Reset form
+      console.log('Resetting form data...')
       setFormData({
         title: '',
         customer_name: '',
@@ -235,6 +246,7 @@ const DocumentForm = ({ formType, onSubmit, editingRecord }) => {
         company_address_line2: 'General Santos City (Dadiangas), 9500 South Cotabato, Philippines',
         company_phone: '(083) 553 1734'
       })
+      console.log('Form reset completed')
     } catch (error) {
       console.error('Error submitting form:', error)
       alert('Error saving document. Please try again.')
